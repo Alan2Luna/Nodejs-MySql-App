@@ -4,18 +4,23 @@ const router = express.Router();
 const pool = require('../database');
 
 router.get('/add', (req, res) => {
-    res.render('../views/links/add.hbs');
+    res.render('links/add');
 })
 
-router.post('/add', (req, res) => {
+router.post('/add', async (req, res) => {
     const { title, url, description } = req.body;
     const newLink = {
         title,
         url,
         description
     };
-    pool.query('INSERT INTO link set ?')
-    res.send('received');
+    await pool.query('INSERT INTO links set ?', [newLink]);
+    res.redirect('/links');
 })
+
+router.get('/', async (req, res) => {
+    const links = await pool.query('SELECT * FROM links');
+    res.render('links/list', {links: links})
+});
 
 module.exports = router;
